@@ -9,6 +9,19 @@ export const JOB_CATEGORIES = [
   "Pre-purchase Inspection"
 ];
 
+export const MECHANIC_SKILLS = [
+  "General Repair",
+  "Logbook Servicing",
+  "Diagnostics",
+  "Diesel Engines",
+  "Brakes & Clutch",
+  "Auto Electrical",
+  "Air Conditioning",
+  "Tyres & Wheels",
+  "Suspension",
+  "Transmission"
+];
+
 export const MOCK_USERS: User[] = [
   {
     id: 'u1',

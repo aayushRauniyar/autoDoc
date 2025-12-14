@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { useAppContext } from '../App';
 import { Button } from '../components/Button';
 import { Input, TextArea } from '../components/Input';
-import { Wrench, Car, ArrowRight, User, Settings, Check, Briefcase, LogIn } from 'lucide-react';
+import { Wrench, Car, ArrowRight, User, Settings, Check, Briefcase, LogIn, Upload, FileText, ShieldCheck, Plus } from 'lucide-react';
 import { UserRole } from '../types';
+import { MECHANIC_SKILLS } from '../constants';
 
 export const Login = () => {
   const { login, users } = useAppContext();
@@ -14,6 +15,11 @@ export const Login = () => {
   const [loginEmail, setLoginEmail] = useState('');
   const [loginError, setLoginError] = useState('');
 
+  // Skills State
+  const [availableSkills, setAvailableSkills] = useState<string[]>(MECHANIC_SKILLS);
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+  const [customSkill, setCustomSkill] = useState('');
+
   // Registration Form State
   const [formData, setFormData] = useState({
     name: '',
@@ -21,7 +27,9 @@ export const Login = () => {
     phone: '',
     abn: '',
     experienceYears: '',
-    bio: ''
+    bio: '',
+    verificationFileName: '',
+    insuranceFileName: ''
   });
 
   const handleSignup = (e: React.FormEvent) => {
@@ -43,7 +51,7 @@ export const Login = () => {
            abn: formData.abn,
            experienceYears: formData.experienceYears ? parseInt(formData.experienceYears) : 0,
            bio: formData.bio,
-           skills: selectedRole === UserRole.MECHANIC ? ['General Repair', 'Diagnostics'] : undefined // Default skills for MVP
+           skills: selectedRole === UserRole.MECHANIC ? selectedSkills : undefined
        });
     }
   };
@@ -65,6 +73,40 @@ export const Login = () => {
       const email = role === UserRole.CUSTOMER ? 'sarah@example.com' : 'mike@mechanic.com';
       login({ email, role });
   }
+
+  const handleFileChange = (field: 'verificationFileName' | 'insuranceFileName') => (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFormData({ ...formData, [field]: e.target.files[0].name });
+    }
+  };
+
+  const toggleSkill = (skill: string) => {
+    if (selectedSkills.includes(skill)) {
+      setSelectedSkills(selectedSkills.filter(s => s !== skill));
+    } else {
+      setSelectedSkills([...selectedSkills, skill]);
+    }
+  };
+
+  const addCustomSkill = () => {
+    const trimmed = customSkill.trim();
+    if (trimmed) {
+      if (!availableSkills.includes(trimmed)) {
+        setAvailableSkills([...availableSkills, trimmed]);
+      }
+      if (!selectedSkills.includes(trimmed)) {
+        setSelectedSkills([...selectedSkills, trimmed]);
+      }
+      setCustomSkill('');
+    }
+  };
+
+  const handleCustomSkillKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addCustomSkill();
+    }
+  };
 
   // --- Step 1: Welcome Screen ---
   if (step === 'WELCOME') {
@@ -339,12 +381,106 @@ export const Login = () => {
                                 onChange={e => setFormData({...formData, experienceYears: e.target.value})} 
                                 required 
                             />
+                            
                             <div className="w-full">
                                 <label className="block text-sm font-bold text-primary mb-2 font-mono">Insurance</label>
-                                <div className="w-full px-4 py-3 bg-secondary-light border-2 border-secondary/20 rounded-lg text-secondary text-sm font-bold flex items-center justify-center cursor-pointer hover:bg-secondary hover:text-white transition-colors">
-                                    Upload PDF
+                                <div className="relative">
+                                     <input 
+                                        type="file" 
+                                        id="insurance-upload" 
+                                        className="hidden" 
+                                        accept=".pdf,.jpg,.png"
+                                        onChange={handleFileChange('insuranceFileName')}
+                                     />
+                                     <label 
+                                        htmlFor="insurance-upload"
+                                        className={`w-full px-4 py-3 border-2 border-dashed rounded-lg text-xs font-bold flex items-center justify-center cursor-pointer transition-colors text-center ${formData.insuranceFileName ? 'bg-secondary/10 border-secondary text-secondary' : 'bg-gray-50 border-gray-200 text-gray-500 hover:bg-gray-100'}`}
+                                     >
+                                         {formData.insuranceFileName ? (
+                                            <span className="truncate max-w-[100px]">{formData.insuranceFileName}</span>
+                                         ) : (
+                                            <span className="flex items-center gap-1"><Upload className="w-3 h-3"/> Upload PDF</span>
+                                         )}
+                                     </label>
                                 </div>
                             </div>
+                        </div>
+
+                        {/* Skills & Expertise Selection */}
+                        <div className="w-full">
+                            <label className="block text-sm font-bold text-primary mb-2 font-mono">
+                                Skills & Expertise
+                            </label>
+                            
+                            <div className="flex flex-wrap gap-2 mb-3">
+                                {availableSkills.map(skill => (
+                                    <button 
+                                        key={skill}
+                                        type="button"
+                                        onClick={() => toggleSkill(skill)}
+                                        className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all border ${
+                                            selectedSkills.includes(skill)
+                                            ? 'bg-primary text-white border-primary shadow-sm'
+                                            : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
+                                        }`}
+                                    >
+                                        {skill}
+                                    </button>
+                                ))}
+                            </div>
+
+                            <div className="relative flex items-center gap-2">
+                                <input 
+                                    type="text" 
+                                    placeholder="Add custom skill..." 
+                                    className="flex-1 px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                                    value={customSkill}
+                                    onChange={(e) => setCustomSkill(e.target.value)}
+                                    onKeyDown={handleCustomSkillKeyDown}
+                                />
+                                <button 
+                                    type="button" 
+                                    onClick={addCustomSkill}
+                                    disabled={!customSkill.trim()}
+                                    className="p-2 bg-secondary text-white rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    <Plus className="w-5 h-5" />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* New Verification Upload */}
+                        <div className="w-full">
+                            <label className="block text-sm font-bold text-primary mb-2 font-mono flex items-center justify-between">
+                                Verification Docs
+                                <span className="text-[10px] bg-gray-100 px-2 py-0.5 rounded text-gray-500 font-sans font-normal">Payslip / Certs</span>
+                            </label>
+                            <div className="relative">
+                                 <input 
+                                    type="file" 
+                                    id="verification-upload" 
+                                    className="hidden" 
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                    onChange={handleFileChange('verificationFileName')}
+                                 />
+                                 <label 
+                                    htmlFor="verification-upload"
+                                    className={`w-full px-4 py-4 border-2 border-dashed rounded-lg text-sm font-medium flex items-center justify-center cursor-pointer transition-colors gap-3 ${formData.verificationFileName ? 'bg-secondary/5 border-secondary text-secondary' : 'bg-gray-50 border-gray-300 text-gray-500 hover:bg-gray-100'}`}
+                                 >
+                                    {formData.verificationFileName ? (
+                                        <>
+                                            <ShieldCheck className="w-5 h-5"/>
+                                            <span className="truncate">{formData.verificationFileName}</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <FileText className="w-5 h-5 text-gray-400"/>
+                                            <span>Upload Certification / Work Letter</span>
+                                        </>
+                                    )}
+                                 </label>
+                            </div>
+                            <p className="text-xs text-gray-400 mt-1.5 ml-1">Required for account approval.</p>
                         </div>
 
                         <TextArea 
