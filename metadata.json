@@ -1,0 +1,9 @@
+{
+  "name": "AutoDoc",
+  "description": "On-demand car mechanic marketplace connecting customers with independent mechanics.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ]
+}

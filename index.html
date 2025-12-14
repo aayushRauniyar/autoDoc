@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#0F2A44" />
+    <title>AutoDoc</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                DEFAULT: '#0F2A44', // Deep Trust Blue
+                light: '#1A3B5C',
+              },
+              secondary: {
+                DEFAULT: '#2FBF71', // Auto Green
+                light: '#EAF9F1', // Light green background
+              },
+              accent: {
+                DEFAULT: '#F5A623', // Warm Amber
+                light: '#FEF6E9',
+              },
+              neutral: {
+                dark: '#2E2E2E', // Text
+                light: '#F4F6F8', // Background
+                white: '#FFFFFF'
+              }
+            },
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        /* Prevent pull-to-refresh on mobile */
+        overscroll-behavior-y: none;
+        /* Disable text selection like a native app */
+        -webkit-user-select: none;
+        user-select: none;
+        /* Remove tap highlight color on mobile */
+        -webkit-tap-highlight-color: transparent;
+      }
+      
+      /* Allow text selection only on input fields */
+      input, textarea {
+        -webkit-user-select: text;
+        user-select: text;
+      }
+
+      /* Handle Safe Areas for iPhone X+ Notches */
+      :root {
+        --sat: env(safe-area-inset-top);
+        --sab: env(safe-area-inset-bottom);
+        --sal: env(safe-area-inset-left);
+        --sar: env(safe-area-inset-right);
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.561.0",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3"
+  }
+}
+</script>
+</head>
+  <body class="bg-neutral-light text-neutral-dark antialiased selection:bg-primary selection:text-white">
+    <div id="root"></div>
+  </body>
+</html>
